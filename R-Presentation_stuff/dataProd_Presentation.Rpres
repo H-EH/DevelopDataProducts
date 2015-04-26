@@ -1,0 +1,82 @@
+Developing Data Products Course 9 Project - Shiny App
+========================================================
+author: 
+date: `r format(Sys.Date(),format="%d %B %Y")`
+
+About the Shiny application
+========================================================
+A simple shiny application that shows how interactive 
+applications help to speed up testing statistical 
+inferences.
+
+This is a simple application that allows the User to key in the
+required test parameters and then performs an Exponential Distribution Simulation to see if the figures gel with
+the CLT - Central Limit Theoram.
+
+As the application shows, technology nowadays allow for
+a data product to be easily built for an End-User, one
+who need not have to go through pages of mathematical or
+statistical or technical jagon just to use the information.
+
+Although in this simple application, due to time constraints, 
+the User must have some idea what the CLT means - to key in
+meaningful values into the parameters.
+
+About the simulation algorithm
+========================================================
+The application backend code is base on this student's 
+project from Course 6 Statistical Inference, Part I - Exponential Distribution Simulation.
+
+That exercise investigated the distribution of averages of 40 numbers sampled from the exponential distribution with $\lambda$ = 0.2 and 1000 simulations. 
+
+That simulation used a fixed Seed of 1234, to obtain the distributed averages using lambda of 0.2, and generated the sample means distribution and compared it with the theoratical mean of the distribution (CLT).
+
+The next 2 slides shows the 2 results from the simulation.
+They are the initial default results when the User opens 
+the application.
+
+Simulated vs Theoram
+========================================================
+
+```{r, echo=FALSE, results=TRUE}
+# variables
+set.seed(1234)
+lambda <- 0.2
+simulation_num <- 1000
+n <- 40
+# generate random data
+simulated_data <- matrix(rexp(simulation_num*n, rate=lambda), simulation_num, n)
+
+# generate averages of means of sample
+meanValues <- rowMeans(simulated_data)
+
+# create a data frame of the simulated and theoraticalmean and variance values
+expdistribution <- data.frame(Mean=c(mean(rowMeans(simulated_data)), 1/lambda),
+                      Variance=c(mean(apply(simulated_data, 1, var)), 1/lambda^2))
+rownames(expdistribution) <- c("Simulated", "Theoretical")
+
+# show the contents
+expdistribution
+```
+
+
+Simulated vs Theoram plotted
+========================================================
+```{r , echo=FALSE}
+# plot means distribution averages 
+library(ggplot2)
+hist(meanValues, breaks=50, prob=TRUE, 
+     main="Averages Sample Means Distribution", xlab="") 
+# draw density of simulation averages
+lines(density(meanValues)) 
+# draw theoratical centre of normal distribution of 5% 
+abline(v=1/lambda, col="red") 
+# draw theoretical density of the averages of samples base on normal distribution 
+xfit <- seq(min(meanValues), max(meanValues), length=100) 
+yfit <- dnorm(xfit, mean=1/lambda, sd=(1/lambda/sqrt(n))) 
+lines(xfit, yfit, pch=22, col="red", lty=2) 
+# add legend 
+legend('bottomright', c("simulation", "theoretical"), lty=c(1,2), col=c("black", "red")) 
+```
+
+~~~~~~~~~~~ The End ~~~~~~~~~~~
